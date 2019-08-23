@@ -25,19 +25,18 @@ def unzip_single(root, file):
     zf.close()
 
 def readKeyWordFromGzAndWrite(key_word, file_path, des_dir): 
+    f = gzip.open(file_path) 
+    file_path = file_path.replace(".gz","")
+    writeFile = open(file_path, mode="wb")
+    targetFile = open(des_dir, mode="a")
+    readFile = open(file_path, mode='r',errors='ignore')
     try:
         shotname, _ = os.path.splitext(file_path)
         if os.path.exists(shotname):
             return
-        f = gzip.open(file_path) 
+        
         file_content = f.read()
-        file_path = file_path.replace(".gz","")
-        writeFile = open(file_path, mode="wb")
         writeFile.write(file_content)
-
-        targetFile = open(des_dir, mode="a")
-        readFile = open(file_path, mode='r',errors='ignore')
-    
         targetFile.write(file_path+"\n")
         file_content = readFile.readline()
 
@@ -45,14 +44,14 @@ def readKeyWordFromGzAndWrite(key_word, file_path, des_dir):
             if find_string(file_content, key_word):
                 targetFile.write(file_content)
             file_content = readFile.readline()
-        
+    
+    except Exception as e:
+        print("readKeyWordFromGzAndWrite and write error: ",e)  
+    finally:  
         f.close()
         writeFile.close()
         targetFile.close()
         readFile.close()
-    except Exception as e:
-        print("readKeyWordFromGzAndWrite and write error: ",e)    
-    
 
 def readKeyWordAndWrite(file_path, key_word, des_dir):
     file = open(file_path, mode='r', errors='ignore')  
@@ -64,7 +63,7 @@ def readKeyWordAndWrite(file_path, key_word, des_dir):
             if text_line.find(key_word) != -1:
                 writeFile.write(text_line)
             text_line = file.readline()
-    except RuntimeError as e:
+    except Exception as e:
         print("read key word and write error: ",e)
     finally:
         file.close()
