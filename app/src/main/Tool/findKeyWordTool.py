@@ -30,6 +30,7 @@ def readKeyWordFromGzAndWrite(key_word, file_path, des_dir):
     writeFile = open(file_path, mode="wb")
     targetFile = open(des_dir, mode="a")
     readFile = open(file_path, mode='r',errors='ignore')
+    isNeedWritePath = True
     try:
         shotname, _ = os.path.splitext(file_path)
         if os.path.exists(shotname):
@@ -37,11 +38,14 @@ def readKeyWordFromGzAndWrite(key_word, file_path, des_dir):
         
         file_content = f.read()
         writeFile.write(file_content)
-        targetFile.write(file_path+"\n")
+        
         file_content = readFile.readline()
 
         while file_content:
             if find_string(file_content, key_word):
+                if isNeedWritePath:
+                    targetFile.write(file_path+"\n")
+                    isNeedWritePath = False
                 targetFile.write(file_content)
             file_content = readFile.readline()
     
@@ -56,11 +60,14 @@ def readKeyWordFromGzAndWrite(key_word, file_path, des_dir):
 def readKeyWordAndWrite(file_path, key_word, des_dir):
     file = open(file_path, mode='r', errors='ignore')  
     writeFile = open(des_dir, mode="a")
-    writeFile.write(file_path+"\n")
+    isNeedWritePath = True
     try:
         text_line = file.readline()
         while text_line:
-            if text_line.find(key_word) != -1:
+            if find_string(text_line, key_word):
+                if isNeedWritePath:
+                    writeFile.write(file_path+"\n")
+                    isNeedWritePath = False
                 writeFile.write(text_line)
             text_line = file.readline()
     except Exception as e:
