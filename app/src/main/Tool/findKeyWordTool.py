@@ -25,22 +25,21 @@ def unzip_single(root, file):
     zf.close()
 
 def readKeyWordFromGzAndWrite(key_word, file_path, des_dir): 
+    shotname, _ = os.path.splitext(file_path)
+    if os.path.exists(shotname):
+        return
+
     f = gzip.open(file_path) 
     file_path = file_path.replace(".gz","")
     writeFile = open(file_path, mode="wb")
     targetFile = open(des_dir, mode="a")
     readFile = open(file_path, mode='r',errors='ignore')
-    isNeedWritePath = True
+    
     try:
-        shotname, _ = os.path.splitext(file_path)
-        if os.path.exists(shotname):
-            return
-        
         file_content = f.read()
         writeFile.write(file_content)
-        
         file_content = readFile.readline()
-
+        isNeedWritePath = True
         while file_content:
             if find_string(file_content, key_word):
                 if isNeedWritePath:
@@ -60,9 +59,10 @@ def readKeyWordFromGzAndWrite(key_word, file_path, des_dir):
 def readKeyWordAndWrite(file_path, key_word, des_dir):
     file = open(file_path, mode='r', errors='ignore')  
     writeFile = open(des_dir, mode="a")
-    isNeedWritePath = True
+    
     try:
         text_line = file.readline()
+        isNeedWritePath = True
         while text_line:
             if find_string(text_line, key_word):
                 if isNeedWritePath:
