@@ -24,6 +24,22 @@ def unzip_single(root, file):
         print("unzip file error: ",e)
     zf.close()
 
+def un_tar(root, file):
+       # untar zip file"""
+    shotname, _ = os.path.splitext(os.path.join(root,file))
+    file_name = os.path.join(root,file)
+    tar = tarfile.open(file_name)
+    names = tar.getnames()
+    print("file name:",shotname)
+    if os.path.isdir(shotname):
+        pass
+    else:
+        os.mkdir(shotname)
+    for name in names:
+        tar.extract(name, shotname)
+    tar.close()
+    return shotname
+
 def readKeyWordFromGzAndWrite(key_word, file_path, des_dir): 
     shotname, _ = os.path.splitext(file_path)
     if os.path.exists(shotname):
@@ -80,6 +96,7 @@ def handleDir(key_word, file_path, des_dir):
     for root, _, files in os.walk(file_path): 
         for file in files: 
             handleInputAndOutput(key_word, os.path.join(root,file), des_dir)
+
         
 def handleInputAndOutput(key_word, intput_file_src, key_word_file_path):
     if os.path.isdir(intput_file_src):  
@@ -90,7 +107,12 @@ def handleInputAndOutput(key_word, intput_file_src, key_word_file_path):
         if unzip_file != "":
             handleDir(key_word,unzip_file,key_word_file_path)
     elif os.path.splitext(intput_file_src)[1]=='.gz':
-        readKeyWordFromGzAndWrite(key_word, intput_file_src,key_word_file_path)
+        readKeyWordFromGzAndWrite(key_word, intput_file_src,key_word_file_path) 
+    elif os.path.splitext(intput_file_src)[1]=='.tar':
+        filepath, tmpfilename = os.path.split(intput_file_src)  
+        un_tar_file = un_tar(filepath, tmpfilename)
+        if un_tar_file != "":
+            handleInputAndOutput(key_word, un_tar_file, key_word_file_path)
     elif os.path.splitext(intput_file_src)[1]=='.txt' or find_string(os.path.splitext(intput_file_src)[1],"log"): 
         readKeyWordAndWrite(intput_file_src,key_word,key_word_file_path)
 
